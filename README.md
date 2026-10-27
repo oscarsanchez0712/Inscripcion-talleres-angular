@@ -1,28 +1,45 @@
 # Inscripción a Talleres (Angular + Reactive Forms)
 
-Formulario reactivo con datos en memoria: validadores integrados, personalizados y asíncrono,
-`FormArray` dinámico, CRUD completo (crear, listar, editar, eliminar) y buscador.
+Página web de inscripción a talleres desarrollada con Angular. Permite registrar participantes, consultar sus datos, buscar inscripciones, editar y eliminar registros mediante operaciones CRUD.
 
-## Ejecutar como proyecto independiente
+El proyecto utiliza **Reactive Forms** para gestionar los formularios y aplicar validaciones integradas, personalizadas y asíncronas. También incluye un `FormArray` dinámico para administrar campos del formulario y utiliza datos en memoria.
+
+## Requisitos
+
+- Node.js y npm
+- Angular CLI
+
+## Ejecutar el proyecto
+
 ```bash
 npm install
 ng serve
 ```
-Abrir http://localhost:4200
+
+Abrir en el navegador: http://localhost:4200
+
+## Funcionalidades
+
+- Registro de participantes.
+- Consulta y búsqueda de inscripciones.
+- Edición y eliminación de registros.
+- Validación de campos obligatorios y formatos.
+- Formularios reactivos con Angular.
+- Gestión de datos en memoria.
 
 ## Pruebas
+
 ```bash
 ng test
 ```
 
-## Integrar en tu repo SO3_RP_Crud
-Copia solo estas carpetas/archivos dentro de tu `src/app` (no reemplaces `app.routes.ts` ni
-`app.component.*` si ya tienes rutas de libros/tareas; en ese caso solo suma la ruta):
-- `components/inscripcion-taller/`
-- `models/inscripcion.model.ts`
-- `services/inscripcion.service.ts`
+## Tecnologías utilizadas
 
-Ruta a sumar en `app.routes.ts`:
-```ts
-{ path: 'inscripciones', component: InscripcionTallerComponent },
-```
+- Angular
+- TypeScript
+- Reactive Forms
+- HTML y CSS
+
+## Objetivo
+
+Facilitar el proceso de inscripción a talleres mediante una aplicación web sencilla, práctica y organizada.
