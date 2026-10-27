@@ -1,0 +1,224 @@
+<section class="pagina">
+  <header class="hero">
+    <span class="hero__etiqueta">Reactive Forms</span>
+    <h1>Inscripción a Talleres</h1>
+    <p>Regístrate en nuestros talleres técnicos. Los datos se guardan en memoria mientras la app esté abierta.</p>
+  </header>
+
+  <div class="toast" *ngIf="mensaje" [class.toast--info]="tipoMensaje === 'info'" role="status">
+    {{ mensaje }}
+  </div>
+
+  <div class="layout">
+    <!-- ================= FORMULARIO ================= -->
+    <form class="tarjeta" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <div class="tarjeta__cabecera">
+        <h2>{{ editandoId !== null ? 'Editar inscripción' : 'Nueva inscripción' }}</h2>
+        <span class="chip chip--edicion" *ngIf="editandoId !== null">Modo edición</span>
+      </div>
+
+      <fieldset>
+        <legend>Datos personales</legend>
+        <div class="grid">
+          <div class="campo">
+            <label for="nombres">Nombres *</label>
+            <input id="nombres" type="text" formControlName="nombres" placeholder="Ej. María Fernanda"
+                   [class.invalido]="esInvalido('nombres')" [class.valido]="esValido('nombres')" />
+            <small class="error" *ngIf="mensajeError('nombres')">{{ mensajeError('nombres') }}</small>
+          </div>
+
+          <div class="campo">
+            <label for="apellidos">Apellidos *</label>
+            <input id="apellidos" type="text" formControlName="apellidos" placeholder="Ej. Torres Ríos"
+                   [class.invalido]="esInvalido('apellidos')" [class.valido]="esValido('apellidos')" />
+            <small class="error" *ngIf="mensajeError('apellidos')">{{ mensajeError('apellidos') }}</small>
+          </div>
+
+          <div class="campo">
+            <label for="dni">DNI *</label>
+            <input id="dni" type="text" inputmode="numeric" maxlength="8" formControlName="dni" placeholder="8 dígitos"
+                   [class.invalido]="esInvalido('dni')" [class.valido]="esValido('dni')" />
+            <small class="ayuda" *ngIf="form.get('dni')?.pending">Verificando disponibilidad…</small>
+            <small class="error" *ngIf="mensajeError('dni')">{{ mensajeError('dni') }}</small>
+          </div>
+
+          <div class="campo">
+            <label for="fechaNacimiento">Fecha de nacimiento *</label>
+            <input id="fechaNacimiento" type="date" [max]="hoy" formControlName="fechaNacimiento"
+                   [class.invalido]="esInvalido('fechaNacimiento')" [class.valido]="esValido('fechaNacimiento')" />
+            <small class="error" *ngIf="mensajeError('fechaNacimiento')">{{ mensajeError('fechaNacimiento') }}</small>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Contacto</legend>
+        <div class="grid">
+          <div class="campo">
+            <label for="email">Correo electrónico *</label>
+            <input id="email" type="email" formControlName="email" placeholder="nombre@correo.com"
+                   [class.invalido]="esInvalido('email')" [class.valido]="esValido('email')" />
+            <small class="error" *ngIf="mensajeError('email')">{{ mensajeError('email') }}</small>
+          </div>
+
+          <div class="campo">
+            <label for="confirmarEmail">Confirmar correo *</label>
+            <input id="confirmarEmail" type="email" formControlName="confirmarEmail" placeholder="Repite tu correo"
+                   [class.invalido]="esInvalido('confirmarEmail') || (form.hasError('camposNoCoinciden') && form.get('confirmarEmail')?.touched)" />
+            <small class="error" *ngIf="mensajeError('confirmarEmail')">{{ mensajeError('confirmarEmail') }}</small>
+          </div>
+
+          <div class="campo">
+            <label for="telefono">Teléfono *</label>
+            <input id="telefono" type="tel" inputmode="numeric" maxlength="9" formControlName="telefono" placeholder="9XXXXXXXX"
+                   [class.invalido]="esInvalido('telefono')" [class.valido]="esValido('telefono')" />
+            <small class="error" *ngIf="mensajeError('telefono')">{{ mensajeError('telefono') }}</small>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Taller</legend>
+        <div class="grid">
+          <div class="campo campo--ancho">
+            <label for="taller">Taller *</label>
+            <select id="taller" formControlName="taller"
+                    [class.invalido]="esInvalido('taller')" [class.valido]="esValido('taller')">
+              <option value="" disabled>Selecciona un taller</option>
+              <option *ngFor="let t of talleres" [value]="t.id">{{ t.nombre }}</option>
+            </select>
+            <small class="error" *ngIf="mensajeError('taller')">{{ mensajeError('taller') }}</small>
+          </div>
+
+          <div class="campo">
+            <span class="etiqueta">Modalidad *</span>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" formControlName="modalidad" value="presencial" /> Presencial</label>
+              <label class="opcion"><input type="radio" formControlName="modalidad" value="virtual" /> Virtual</label>
+            </div>
+          </div>
+
+          <div class="campo">
+            <span class="etiqueta">Nivel *</span>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" formControlName="nivel" value="basico" /> Básico</label>
+              <label class="opcion"><input type="radio" formControlName="nivel" value="intermedio" /> Intermedio</label>
+              <label class="opcion"><input type="radio" formControlName="nivel" value="avanzado" /> Avanzado</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>
+          Acompañantes
+          <span class="contador">{{ acompanantes.length }}/{{ maxAcompanantes }}</span>
+        </legend>
+
+        <div formArrayName="acompanantes">
+          <div class="acompanante" *ngFor="let a of acompanantes.controls; let i = index" [formGroupName]="i">
+            <div class="campo">
+              <label [for]="'acNombre' + i">Nombre completo *</label>
+              <input [id]="'acNombre' + i" type="text" formControlName="nombre" placeholder="Nombre del acompañante"
+                     [class.invalido]="esInvalido('acompanantes.' + i + '.nombre')" />
+              <small class="error" *ngIf="mensajeError('acompanantes.' + i + '.nombre')">
+                {{ mensajeError('acompanantes.' + i + '.nombre') }}
+              </small>
+            </div>
+            <div class="campo">
+              <label [for]="'acDni' + i">DNI *</label>
+              <input [id]="'acDni' + i" type="text" inputmode="numeric" maxlength="8" formControlName="dni" placeholder="8 dígitos"
+                     [class.invalido]="esInvalido('acompanantes.' + i + '.dni')" />
+              <small class="error" *ngIf="mensajeError('acompanantes.' + i + '.dni')">
+                {{ mensajeError('acompanantes.' + i + '.dni') }}
+              </small>
+            </div>
+            <button type="button" class="btn btn--peligro-suave" (click)="quitarAcompanante(i)" aria-label="Quitar acompañante">✕</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn--secundario" (click)="agregarAcompanante()"
+                [disabled]="acompanantes.length >= maxAcompanantes">
+          + Agregar acompañante
+        </button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Comentarios</legend>
+        <div class="campo">
+          <textarea id="comentarios" rows="3" formControlName="comentarios" placeholder="¿Algo que debamos saber? (opcional)"
+                    [class.invalido]="esInvalido('comentarios')"></textarea>
+          <div class="pie-campo">
+            <small class="error" *ngIf="mensajeError('comentarios')">{{ mensajeError('comentarios') }}</small>
+            <small class="ayuda">{{ comentariosLongitud }}/200</small>
+          </div>
+        </div>
+
+        <label class="terminos">
+          <input type="checkbox" formControlName="aceptaTerminos" />
+          Acepto los términos y condiciones del taller *
+        </label>
+        <small class="error" *ngIf="mensajeError('aceptaTerminos')">{{ mensajeError('aceptaTerminos') }}</small>
+      </fieldset>
+
+      <div class="acciones">
+        <button type="submit" class="btn btn--primario" [disabled]="form.invalid || form.pending">
+          {{ editandoId !== null ? 'Guardar cambios' : 'Inscribirme' }}
+        </button>
+        <button type="button" class="btn btn--secundario" (click)="limpiar()">
+          {{ editandoId !== null ? 'Cancelar edición' : 'Limpiar' }}
+        </button>
+      </div>
+      <p class="ayuda" *ngIf="form.invalid">Completa los campos obligatorios (*) para habilitar el envío.</p>
+    </form>
+
+    <!-- ================= LISTADO ================= -->
+    <section class="tarjeta">
+      <div class="tarjeta__cabecera">
+        <h2>Inscritos</h2>
+        <input class="buscador" type="search" [formControl]="filtro" placeholder="Buscar por nombre, DNI o taller" />
+      </div>
+
+      <ng-container *ngIf="inscripciones$ | async as lista">
+        <div class="vacio" *ngIf="lista.length === 0">No hay inscripciones para mostrar.</div>
+
+        <div class="tabla-scroll" *ngIf="lista.length > 0">
+          <table>
+            <thead>
+              <tr>
+                <th>Participante</th>
+                <th>DNI</th>
+                <th>Taller</th>
+                <th>Modalidad</th>
+                <th>Acomp.</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let i of lista; trackBy: trackPorId" [class.fila-activa]="i.id === editandoId">
+                <td>
+                  <strong>{{ i.nombres }} {{ i.apellidos }}</strong>
+                  <div class="sub">{{ i.email }}</div>
+                </td>
+                <td>{{ i.dni }}</td>
+                <td>
+                  {{ nombreTaller(i.taller) }}
+                  <div class="sub">{{ i.nivel | titlecase }}</div>
+                </td>
+                <td>
+                  <span class="chip" [class.chip--virtual]="i.modalidad === 'virtual'">{{ i.modalidad | titlecase }}</span>
+                </td>
+                <td>{{ i.acompanantes.length }}</td>
+                <td class="celda-acciones">
+                  <button type="button" class="btn btn--icono" (click)="editar(i)" title="Editar">✎</button>
+                  <button type="button" class="btn btn--icono btn--icono-peligro" (click)="eliminar(i)" title="Eliminar">🗑</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="ayuda">Total mostrado: {{ lista.length }}</p>
+      </ng-container>
+    </section>
+  </div>
+</section>

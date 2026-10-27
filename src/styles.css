@@ -1,0 +1,8 @@
+/* Estilos globales */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  background: #f3f4f8;
+  color: #1f2937;
+}
